@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, Modal, Pressable, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
+import { useNavigation } from '@react-navigation/native'; 
+import LoginScreen from './login.jsx';
 
   const dataVoice = [
     { label: 'British Male', value: 'britishmale' },
@@ -14,7 +16,7 @@ import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
     const renderLabel = () => {
       if (value || isFocus) {
         return (
-          <Text style={[styles.label, isFocus && { color: 'blue' }]}>
+          <Text style={[styles.label, isFocus && { color: 'dodgerblue' }]}>
             Voice
           </Text>
         );
@@ -26,7 +28,7 @@ import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
       <View style={styles.container}>
         {renderLabel()}
         <Dropdown
-          style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+          style={[styles.dropdown, isFocus && { borderColor: 'dodgerblue' }]}
           placeholderStyle={styles.placeholderStyle}
           selectedTextStyle={styles.selectedTextStyle}
           data={dataVoice}
@@ -60,7 +62,7 @@ import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
     const renderLabel = () => {
       if (value || isFocus) {
         return (
-          <Text style={[styles.label, isFocus && { color: 'blue' }]}>
+          <Text style={[styles.label, isFocus && { color: 'dodgerblue' }]}>
             Personality
           </Text>
         );
@@ -72,7 +74,7 @@ import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
       <View style={styles.container}>
         {renderLabel()}
         <Dropdown
-          style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
+          style={[styles.dropdown, isFocus && { borderColor: 'dodgerblue' }]}
           placeholderStyle={styles.placeholderStyle}
           selectedTextStyle={styles.selectedTextStyle}
           data={dataPersonality}
@@ -105,7 +107,7 @@ import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
     return (
       <View style={styles.container}>
         <MultiSelect
-          style={styles.dropdown}
+          style={styles.dropdownMultiSelect}
           placeholderStyle={styles.placeholderStyle}
           selectedTextStyle={styles.selectedTextStyle}
           data={dataHobbies}
@@ -122,6 +124,31 @@ import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
     );
   };
 
+  const LogoutScreen = () => {
+    const navigation = useNavigation();
+  
+    const handleLogout = () => {
+      // actually logout TODO
+      
+      navigation.navigate('Login'); 
+    };
+  
+    return (
+      <View>
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={handleLogout}
+          underlayColor='#fff'>
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+ 
+
+
+
   export default function MessageLog ()
   {
     return (
@@ -129,6 +156,10 @@ import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
       <DropdownVoice/>
       <DropdownPersonality/>
       <MultiSelectComponent/>
+
+     <LogoutScreen/>
+      
+
     </View>
     );
   }
@@ -139,7 +170,14 @@ import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
       backgroundColor: 'white',
       padding: 16,
     },
+    dropdownMultiSelect: {
+      height: 50,
+      backgroundColor: 'transparent',
+      borderBottomColor: 'gray',
+      borderBottomWidth: 0.5,
+    },
     dropdown: {
+      backgroundColor: 'white',
       height: 50,
       borderColor: 'gray',
       borderWidth: 0.5,
@@ -160,6 +198,63 @@ import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
     },
     selectedTextStyle: {
       fontSize: 16,
+    },
+    logoutText: {
+      fontSize: 17,
+      color: "#fff",
+      textAlign: 'center',
+      paddingTop: 5,
+      paddingBottom: 5
+    },
+    logoutButton: {
+      marginTop: 15,
+      marginRight: 155,
+      marginLeft: 155,
+      backgroundColor:'dodgerblue',
+      borderRadius: 15
+    },
+
+    centeredView: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginTop: 22,
+    },
+    modalView: {
+      margin: 20,
+      backgroundColor: 'white',
+      borderRadius: 20,
+      padding: 35,
+      alignItems: 'center',
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5,
+    },
+    button: {
+      backgroundColor: "black",
+      borderRadius: 20,
+      padding: 10,
+      elevation: 2,
+    },
+    buttonOpen: {
+      backgroundColor: '#F194FF',
+    },
+    buttonClose: {
+      backgroundColor: '#2196F3',
+    },
+    textStyle: {
+      color: 'white',
+      fontWeight: 'bold',
+      textAlign: 'center',
+    },
+    modalText: {
+      marginBottom: 15,
+      textAlign: 'center',
     },
   });
 
