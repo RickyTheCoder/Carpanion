@@ -1,23 +1,34 @@
-# Starting Redis server on Ubuntu:
+# How to set up
 
+1. Start Virtual Environment
 ```bash
-sudo service redis-server start
+$ python3 -m venv venv
+$ source venv/bin/activate
+or
+$ . venv/bin/activate 
+on Windows
 ```
 
-# Stopping Redis server on Ubuntu:
 
+2. Install requirements
 ```bash
-sudo service redis-server stop
+$ pip install -r requirements.txt
 ```
 
-# Restarting Redis server on Ubuntu:
+3. Set up environment variables
 
+- Create a .env.local file in the root directory of the project
+- Copy the contents of the .env.example file into the .env.local file
+- Fill in the values of the variables in the .env.local file
+
+4. Migrate the database
 ```bash
-sudo service redis-server restart
+$ python manage.py migrate
 ```
 
-# Checking the status of Redis server on Ubuntu:
-
+5. Run the server
 ```bash
-sudo service redis-server status
+$ python manage.py runserver
 ```
+
+Voila! The server is up and running. You can now access the API at http://localhost:8000/

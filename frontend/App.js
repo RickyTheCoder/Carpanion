@@ -3,6 +3,9 @@ import { Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginScreen from './screens/login';
+import MessageLog from './screens/messagelog';
+import Settings from './screens/settings';
+import { Ionicons } from '@expo/vector-icons';
 
 function HomeScreen() {
   return (
@@ -12,13 +15,32 @@ function HomeScreen() {
   );
 }
 
+
+
 const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
       <Tab.Navigator>
-        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Video Feed" component={HomeScreen} 
+        options={{
+          tabBarIcon: ({ color, size }) => 
+          (<Ionicons name="videocam" color={color} size={size} />),
+        }}
+        />
+        <Tab.Screen name="Message Log" component={MessageLog} 
+        options={{
+          tabBarIcon: ({ color, size }) => 
+          (<Ionicons name="chatbox" color={color} size={size} />),
+        }}
+        />
+        <Tab.Screen name="Settings" component={Settings} 
+        options={{
+          tabBarIcon: ({ color, size }) => 
+          (<Ionicons name="settings-sharp" color={color} size={size} />),
+        }}
+        />
         <Tab.Screen name="Login" component={LoginScreen} />
       </Tab.Navigator>
     </NavigationContainer>
