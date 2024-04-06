@@ -1,0 +1,7 @@
+# Environment
+.venv
+.env
+.env.local
+db.sqlite3
+
+*.pyc
