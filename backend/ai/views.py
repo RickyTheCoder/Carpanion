@@ -2,6 +2,8 @@ from django.shortcuts import render
 from core.env import env
 import base64
 
+import requests
+
 from django.http import FileResponse
 
 from rest_framework.views import APIView
@@ -75,9 +77,19 @@ class TranscribeAudioView(APIView):
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import parser_classes
 
+def get_location(ip_address):
+    response = requests.get(f'https://ipapi.co/{ip_address}/json/').json()
+    location_data = {
+        "ip": ip_address,
+        "city": response.get("city"),
+        "region": response.get("region"),
+        "country": response.get("country_name")
+    }
 class ImageToTextView(APIView):
     @parser_classes((JSONParser,))
     def post(self, request):
+        print(request.META.get('REMOTE_ADDR'))
+
         image_data = request.data.get('image')
         camera_is_front_facing = request.data.get('camera_is_front_facing', False)
         if not image_data:
@@ -99,8 +111,7 @@ class ImageToTextView(APIView):
         if labels:
             label = labels[0]
             
-            prompt = f"""Tell me a fun fact about {label} or tell me a joke about {label}. Only one of the two will be generated. If this value is true: {camera_is_front_facing}, then generate a random compliment about a beautiful person. Make it
-            flow, make it sound natural. It should all be in second person like you're talking to someone.
+            prompt = f"""Tell me a fun fact about {label} or tell me a joke about {label}. Only one of the two will be generated.
             """
             
             response = text2text(prompt)
