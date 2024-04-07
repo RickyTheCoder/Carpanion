@@ -25,7 +25,9 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '10.103.232.163',
+    ]
 
 SITE_ID = 1
 
@@ -272,10 +274,7 @@ REST_KNOX = {
 
 # CORS
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-     "http://localhost:3001",
-    "http://localhost:8000",
-    "http://localhost:8080",
-
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = [
+    'http://10.103.232.163:8081'
 ]
