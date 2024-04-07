@@ -6,8 +6,30 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginScreen from './screens/login';
 import MessageLog from './screens/messagelog';
 import Settings from './screens/settings';
+import ChangePassword from './screens/changepassword'
 import { Ionicons } from '@expo/vector-icons';
 import { Camera, CameraType } from 'expo-camera';
+import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
+
+const TensorCamera = cameraWithTensors(Camera);
+
+
+const handleCameraStream = (images, updatePreview, gl) => {
+  const loop = async () => {
+    const nextImageTensor = images.next().value
+
+    //
+    // do something with tensor here
+    //
+
+    // if autorender is false you need the following two lines.
+    // updatePreview();
+    // gl.endFrameEXP();
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
 
 
 const Video = () => {
@@ -47,29 +69,47 @@ const Video = () => {
   /* @end */
 
   function toggleCameraType() {
-    setType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
+    setType(current => (current === Camera.Constants.Type.back ? Camera.Constants.Type.front : Camera.Constants.Type.back));
   }
 
   return (
+    
     <View>
-      <Camera style={styles.camera} type={type}>
+      {/* <Camera style={styles.camera} type={type}> */}
+      <TensorCamera style={styles.camera} 
+      type={Camera.Constants.Type.back}
+      onReady={handleCameraStream}
+      autorender={true}
+      >
+      
+     
       <View>
+      <Ionicons name="camera-reverse-outline" 
+        size={40}
+        style={{
+          marginLeft: "80%",
+          color: 'black',
+          
+          }}/>
       <TouchableOpacity onPress={toggleCameraType}>
           
-            <Ionicons name="camera-reverse-outline" 
-            size={40}
-            style={{
-              marginLeft: "90%",
-              color: 'white'
-              }}/>
-            
+        <Ionicons name="camera-reverse-outline" 
+        size={40}
+        style={{
+          marginLeft: "90%",
+          color: 'black',
           
+          }}/>
       </TouchableOpacity>
-      </View>
+      </View> 
+      </TensorCamera>
+      
+      
+      
        {/*  <TouchableOpacity style={styles.grantButton} onPress={toggleCameraType}>
             <Text style={styles.grantText}>Flip Camera</Text>
         </TouchableOpacity> */}
-      </Camera>
+      
     </View>
     
   );
@@ -77,6 +117,7 @@ const Video = () => {
 import { AuthProvider } from './components/AuthProvider';
 
 import { useAuth } from './components/AuthProvider';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 function HomeScreen() {
   return (
@@ -91,14 +132,13 @@ function HomeScreen() {
 
 
 const Tab = createBottomTabNavigator();
-
-export default function App() {
+const Stack = createNativeStackNavigator();
+function HomeTabs() {
   const { isAuthenticated } = useAuth();
   return (
     <AuthProvider>
 
-      <NavigationContainer>
-        { !isAuthenticated ? (
+        { isAuthenticated ? (
           <Tab.Navigator>
           <Tab.Screen name="Video Feed" component={HomeScreen} 
           options={{
@@ -122,12 +162,33 @@ export default function App() {
         ) : (
           <LoginScreen />
         ) }
-       
-      </NavigationContainer>
+
+      
+
+     {/*  <NavigationContainer>
+        <Stack.Navigator initialRouteName="Home">
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Login" component={LoginScreen}/>
+        </Stack.Navigator>
+      </NavigationContainer> */}
     </AuthProvider>
   );
 }
 
+export default function App() {
+  return (
+    <NavigationContainer>
+    <Stack.Navigator >
+      <Stack.Screen name="Home" component={HomeTabs} options={{headerShown: false}}/>
+      <Stack.Screen name="Change Password" component={ChangePassword} options={{ headerBackTitle: 'Back' }}/>
+      <Stack.Screen name="Login" 
+      component={LoginScreen} 
+      options={{headerBackTitle: 'Back', headerBackTitleStyle: {fontSize: 30,}}}/>  
+       
+    </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
 const styles = StyleSheet.create({
   container: {
    
