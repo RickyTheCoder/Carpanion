@@ -77,21 +77,31 @@ class TranscribeAudioView(APIView):
 from rest_framework.parsers import JSONParser
 from rest_framework.decorators import parser_classes
 
-def get_location(ip_address):
-    response = requests.get(f'https://ipapi.co/{ip_address}/json/').json()
-    location_data = {
-        "ip": ip_address,
-        "city": response.get("city"),
-        "region": response.get("region"),
-        "country": response.get("country_name")
-    }
+def get_location(lat, lon):
+    api_ninja_key = env('APININJA_API')
+
+    if not lat or not lon:
+        return None
+    
+    response = requests.get(f'https://api.api-ninjas.com/v1/reversegeocoding?lat={lat}&lon={lon}', headers={
+        'X-Api-Key': api_ninja_key
+    }).json()
+    location_data = response[0]
+
+    print(location_data)
+    
+    return location_data
+
 class ImageToTextView(APIView):
     @parser_classes((JSONParser,))
     def post(self, request):
-        print(request.META.get('REMOTE_ADDR'))
+        
+        lat, lon = request.data.get('latitude'), request.data.get('longitude')
+        
+        location = get_location(lat, lon)
 
         image_data = request.data.get('image')
-        camera_is_front_facing = request.data.get('camera_is_front_facing', False)
+
         if not image_data:
             raise APIException('Image URL is required.', code=400)
         # base64 encode the image data byte string
@@ -112,6 +122,7 @@ class ImageToTextView(APIView):
             label = labels[0]
             
             prompt = f"""Tell me a fun fact about {label} or tell me a joke about {label}. Only one of the two will be generated.
+            
             """
             
             response = text2text(prompt)
@@ -123,6 +134,23 @@ class ImageToTextView(APIView):
             audio_base64 = base64.b64encode(audio_file).decode('utf-8')
             
             return Response({'output': response, 'audio': audio_base64 })
+        
+        else:
+            print(location)
+            if location:
+                prompt = f"""
+                Generate a fun fact or joke about {location['name']}, {location['country']}, {location.get('state', '')}.
+                It should be one of the two, not both.
+                """
+
+                response = text2text(prompt)
+
+                audio_file = text2speech(response)
+
+                audio_base64 = base64.b64encode(audio_file).decode('utf-8')
+
+                return Response({'output': response, 'audio': audio_base64 })
+            
 
 
         raise APIException('No labels detected.', code=400)

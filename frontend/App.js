@@ -13,6 +13,7 @@ import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
 import { Audio } from 'expo-av';
 import * as Speech from 'expo-speech';
 import * as FileSystem from 'expo-file-system';
+import * as Location from 'expo-location';
 
 const TensorCamera = cameraWithTensors(Camera);
 
@@ -56,12 +57,21 @@ const Video = () => {
   const [userCanTalk, setUserCanTalk] = useState(true);
   const [userIsTalking, setUserIsTalking] = useState(false);
   const [recording, setRecording] = useState(null);
+  const [location, setLocation] = useState(null);
   
   const requestPermission = async () => {
     const cameraGranted = await requestPermissionCamera();
     const microphoneGranted = await requestPermissionMicrophone();
     const audioGranted = await requestPermissionAudio();
+
+    let { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      console.log('Location permission not granted');
+    }
+    const location = await Location.getCurrentPositionAsync({});
+    setLocation(location);
   };
+
   const [permissionCamera, requestPermissionCamera] = Camera.useCameraPermissions();
   const [permissionMicrophone, requestPermissionMicrophone] = Camera.useMicrophonePermissions();
   const [permissionAudio, requestPermissionAudio] = Audio.usePermissions();
@@ -128,7 +138,9 @@ const Video = () => {
           },
           body: JSON.stringify({ 
             image: photo.base64, 
-            camera_is_front_facing: type === Camera.Constants.Type.front 
+            camera_is_front_facing: type === Camera.Constants.Type.front ,
+           latitude: location && location.coords.latitude,
+            longitude: location && location.coords.longitude,
           }),
         })
 
