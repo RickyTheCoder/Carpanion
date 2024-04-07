@@ -77,7 +77,75 @@ const Video = () => {
   const [permissionMicrophone, requestPermissionMicrophone] = Camera.useMicrophonePermissions();
   const [permissionAudio, requestPermissionAudio] = Audio.usePermissions();
 
-    
+  const takePhoto = async () => {
+    if (!canGetAIInfo || userIsTalking) {
+      return;
+    }
+
+    if (cameraRef.current) {
+
+      setCanGetAIInfo(false);
+      
+      let photo = await cameraRef.current.takePictureAsync({
+        base64: true,
+      });
+
+
+      // send photo to api backend
+
+      const res = await fetch('http://10.103.232.163:8000/ai/image_to_text/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          image: photo.base64, 
+          camera_is_front_facing: type === Camera.Constants.Type.front ,
+         latitude: location && location.coords.latitude,
+          longitude: location && location.coords.longitude,
+        }),
+      })
+
+      if (!res.ok) {
+        console.log('Error sending image to backend');
+        setCanGetAIInfo(true);
+        return;
+      }
+
+      const data = await res.json();
+
+      const path = FileSystem.documentDirectory + 'audio.mp3';
+
+      const audioBase64 = data.audio;
+
+    // write the base64 audio data to a file
+    await FileSystem.writeAsStringAsync(path, audioBase64, { encoding: FileSystem.EncodingType.Base64 });
+
+          // create a new sound object
+    const soundObject = new Audio.Sound();
+
+    try {
+      // load the sound from the file
+      await soundObject.loadAsync({ uri: path });
+
+      // play the sound
+
+      soundObject.setOnPlaybackStatusUpdate((status) => {
+        if (status.didJustFinish) {
+          soundObject.unloadAsync();
+          setCanGetAIInfo(true);
+          setUserIsTalking(true);
+        }
+      });
+      
+      await soundObject.playAsync();
+    } catch (error) {
+      console.log('Error playing sound', error);
+    }
+
+    }
+  }
+
     async function startRecording() {
       try {
         if (permissionAudio.status !== 'granted') {
@@ -96,6 +164,12 @@ const Video = () => {
         setUserIsTalking(true);
 
         setRecording(recording);
+
+        // stop the recording after 10 seconds
+        setTimeout(() => {
+          stopRecording();
+          takePhoto();
+        }, 10000);
 
         // after 5 seconds stop recording
         await recording.prepareToRecordAsync();
@@ -173,6 +247,7 @@ const Video = () => {
         setCanGetAIInfo(false);
         setCanCancelRecording(true);
         setUserIsTalking(true);
+        startRecording();
       }
 
     } catch (error) {
@@ -186,74 +261,7 @@ const Video = () => {
       return;
     }
 
-    const takePhoto = async () => {
-      if (!canGetAIInfo || userIsTalking) {
-        return;
-      }
-
-      if (cameraRef.current) {
-
-        setCanGetAIInfo(false);
-        
-        let photo = await cameraRef.current.takePictureAsync({
-          base64: true,
-        });
-
-
-        // send photo to api backend
-
-        const res = await fetch('http://10.103.232.163:8000/ai/image_to_text/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            image: photo.base64, 
-            camera_is_front_facing: type === Camera.Constants.Type.front ,
-           latitude: location && location.coords.latitude,
-            longitude: location && location.coords.longitude,
-          }),
-        })
-
-        if (!res.ok) {
-          console.log('Error sending image to backend');
-          setCanGetAIInfo(true);
-          return;
-        }
-
-        const data = await res.json();
-
-        const path = FileSystem.documentDirectory + 'audio.mp3';
-
-        const audioBase64 = data.audio;
-
-      // write the base64 audio data to a file
-      await FileSystem.writeAsStringAsync(path, audioBase64, { encoding: FileSystem.EncodingType.Base64 });
-
-            // create a new sound object
-      const soundObject = new Audio.Sound();
-
-      try {
-        // load the sound from the file
-        await soundObject.loadAsync({ uri: path });
-
-        // play the sound
-
-        soundObject.setOnPlaybackStatusUpdate((status) => {
-          if (status.didJustFinish) {
-            soundObject.unloadAsync();
-            setCanGetAIInfo(true);
-            setUserIsTalking(true);
-          }
-        });
-        
-        await soundObject.playAsync();
-      } catch (error) {
-        console.log('Error playing sound', error);
-      }
-
-      }
-    }
+    
 
     const interval = setInterval(takePhoto, 10000);
 
