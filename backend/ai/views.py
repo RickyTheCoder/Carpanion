@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from core.env import env
+import base64
 # Create your views here.
 
 from rest_framework.views import APIView
@@ -68,3 +69,19 @@ class TranscribeAudioView(APIView):
         
         raise APIException('Audio file is required.', code=400)
         
+
+class ImageToTextView(APIView):
+    def post(self, request):
+        image_data = request.data.get('image')
+        print('image_data obtained from postman')
+        import time; time.sleep(5)
+        print(type(image_data))
+        print(image_data)
+        if not image_data:
+            raise APIException('Image URL is required.', code=400)
+        # base64 encode the image data byte string
+        base64_image = base64.b64decode(image_data.read())
+        print(base64_image[:100])
+
+        output = image2text(base64_image)
+        return Response({'output': output})
