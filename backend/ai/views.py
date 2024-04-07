@@ -110,8 +110,25 @@ class ImageToTextView(APIView):
 
         # for each detection, get the label
 
-        for detection in output:
-            labels.append(detection['label'])
+        try:
+            for detection in output:
+                labels.append(detection['label'])
+        except Exception as e:
+            if location:
+                prompt = f"""
+                Generate a fun fact or joke about {location['name']}, {location['country']}, {location.get('state', '')}.
+                It should be one of the two, not both.
+                """
+
+                response = text2text(prompt)
+
+                audio_file = text2speech(response)
+
+                audio_base64 = base64.b64encode(audio_file).decode('utf-8')
+
+                return Response({'output': response, 'audio': audio_base64 })
+            else:
+                raise APIException('No labels detected.', code=400)
 
         # randomly select a label and generate either a fun fact or a joke
 
