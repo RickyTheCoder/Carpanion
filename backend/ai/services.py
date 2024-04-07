@@ -1,8 +1,9 @@
 import base64
-import io
+import io, os
 from core.env import env
 import asyncio
 from openai import OpenAI
+import pygame
 
 
 def data_uri_to_blob(data_uri):
@@ -37,8 +38,26 @@ def text2text(text):
     response = chat_completion.choices[0].message.content
     return response
 
+def text2speech(text):
+    client = OpenAI()
+
+    response = client.audio.speech.create(
+        model="tts-1",
+        voice="alloy",
+        input=text,
+    )
+    speech_file_path = "output.mp3"
+    with open(speech_file_path, "wb") as f:
+        f.write(response.read())
+
+    # play the audio file
+    pygame.mixer.init()
+    pygame.mixer.music.load(speech_file_path)
+    pygame.mixer.music.play()
+
+
 if __name__ == "__main__":
-    text2text("Say this is a test")
+    text2speech(text2text("Say this is a test"))
 
     # # Create a chat model
     # chat_model = .create(
