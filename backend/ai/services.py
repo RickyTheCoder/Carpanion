@@ -105,3 +105,16 @@ if __name__ == "__main__":
 
     # Parse the response
     # ...
+
+import whisper
+
+def load_whisper_model():
+    # Load the Whisper model
+    # Choose the model size appropriate for your use case and hardware
+    model = whisper.load_model("base")
+    return model
+
+def transcribe_audio(model, audio_path):
+    # Transcribe the audio file using Whisper
+    result = model.transcribe(audio_path)
+    return result["text"]

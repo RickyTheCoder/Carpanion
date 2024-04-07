@@ -1,5 +1,3 @@
-# backend/ai/transcription.py
-
 import whisper
 
 model = whisper.load_model("base")  # Load the Whisper model
