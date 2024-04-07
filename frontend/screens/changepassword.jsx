@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { TouchableOpacity, Text, View, TextInput, Button, Alert, StyleSheet } from 'react-native';
 
 import { useNavigation } from '@react-navigation/native'; 
+import { useAuth } from '../components/AuthProvider';
 
 
 export default function ChangePassword() {
@@ -9,15 +10,28 @@ export default function ChangePassword() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const { token } = useAuth();
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
     // Validate if the new password matches the confirm password
     if (newPassword !== confirmPassword) {
       Alert.alert('Error', 'Passwords do not match.');
       return;
     }
 
-    // TODO fix logic
+    const res = await fetch('http://10.103.232.163:8000/api/v1/auth/password/change/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Token ' + token,
+      },
+      body: JSON.stringify({ old_password: currentPassword, new_password1: newPassword, new_password2: confirmPassword }),
+    })
+
+    if (!res.ok) {
+      Alert.alert('Error', 'Failed to change password.');
+      return;
+    }
     
     Alert.alert('Success', 'Password changed successfully.', [
       {
@@ -45,7 +59,7 @@ export default function ChangePassword() {
         value={currentPassword}
         onChangeText={setCurrentPassword}
       />
-      <Text style={styles.inputTitle}>New Password</Text>
+      <Text style={styles.inputTitle}>{token}New Password</Text>
       <TextInput
         style={styles.input}
         placeholder=""
