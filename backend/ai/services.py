@@ -60,7 +60,7 @@ def image2text(image_url):
     import requests
 
     API_URL = "https://api-inference.huggingface.co/models/hustvl/yolos-tiny"
-    headers = {"Authorization": f"Bearer {env("HF_API_TOKEN")}"}
+    headers = {"Authorization": f"Bearer {env('HF_API_TOKEN')}"}
 
     def query(filename):
         with open(filename, "rb") as f:
