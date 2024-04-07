@@ -76,34 +76,67 @@ const Video = () => {
   const [permissionMicrophone, requestPermissionMicrophone] = Camera.useMicrophonePermissions();
   const [permissionAudio, requestPermissionAudio] = Audio.usePermissions();
 
-  const startRecording = async () => {
     
-    await Audio.setAudioModeAsync({
-      allowsRecordingIOS: true,
-      playsInSilentModeIOS: false,
-      staysActiveInBackground: true,
-      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
-      shouldDuckAndroid: true,
-      interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
-      playThroughEarpieceAndroid: true,
-    });
+    async function startRecording() {
+      try {
+        if (permissionAudio.status !== 'granted') {
+          console.log('Requesting permission..');
+          await requestPermission();
+        }
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+        });
+  
+        console.log('Starting recording..');
+        const { recording } = await Audio.Recording.createAsync( Audio.RecordingOptionsPresets.HIGH_QUALITY
+        );
 
-    const newRecording = new Audio.Recording();
-    setRecording(newRecording);
-    try {
-      await newRecording.prepareToRecordAsync(Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY);
-      await newRecording.startAsync();
-      console.log('Recording started');
-      Speech.start({ onDone: stopRecording });
-    } catch (error) {
-      console.log('Error starting recording', error);
+        setRecording(recording);
+
+        // after 5 seconds stop recording
+        await recording.startAsync();
+
+        setTimeout(() => {
+          stopRecording();
+        }, 5000);
+
+        console.log('Recording started');
+      } catch (err) {
+      }
     }
-  };
 
   const stopRecording = async () => {
     try {
       console.log('Stopping recording')
+      if (!recording) {
+        return;
+      }
+
       await recording.stopAndUnloadAsync();
+      await Audio.setAudioModeAsync(
+        {
+          allowsRecordingIOS: false,
+        }
+      );
+      const uri = recording.getURI();
+      // turn the recording into a base64 string
+      const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+
+      // send the base64 string to the backend
+      const res = await fetch('http://10.103.232.163:8000/ai/image_to_text/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          audio: base64, 
+          latitude: location && location.coords.latitude,
+          longitude: location && location.coords.longitude,
+        }),
+      });
+      console.log('Recording stopped and stored at', uri);
+
     } catch (error) {
       console.log('Error stopping recording', error);
     }
@@ -186,9 +219,11 @@ const Video = () => {
     const interval = setInterval(takePhoto, 3000);
 
     requestPermission();
+    startRecording();
 
     return () => {
       clearInterval(interval);
+      stopRecording();
     }
     
   }, [canGetAIInfo]);
@@ -255,6 +290,7 @@ const Video = () => {
     
   );
 }
+
 import { AuthProvider } from './components/AuthProvider';
 
 import { useAuth } from './components/AuthProvider';
