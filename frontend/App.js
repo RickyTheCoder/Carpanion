@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Text, View, StyleSheet, Button, TouchableOpacity, TouchableHighlight } from 'react-native';
+import { Text, View, StyleSheet, Button, TouchableOpacity, TouchableHighlight, Alert } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginScreen from './screens/login';
@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Camera, CameraType } from 'expo-camera';
 import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
 import { Audio } from 'expo-av';
+import * as Speech from 'expo-speech';
 import * as FileSystem from 'expo-file-system';
 
 const TensorCamera = cameraWithTensors(Camera);
@@ -52,16 +53,55 @@ const Video = () => {
   const cameraRef = React.useRef(null);
   const [type, setType] = useState(CameraType.back);
   const [canGetAIInfo, setCanGetAIInfo] = useState(true);
+  const [userCanTalk, setUserCanTalk] = useState(true);
+  const [userIsTalking, setUserIsTalking] = useState(false);
+  const [recording, setRecording] = useState(null);
   
   const requestPermission = async () => {
     const cameraGranted = await requestPermissionCamera();
     const microphoneGranted = await requestPermissionMicrophone();
+    const audioGranted = await requestPermissionAudio();
   };
   const [permissionCamera, requestPermissionCamera] = Camera.useCameraPermissions();
   const [permissionMicrophone, requestPermissionMicrophone] = Camera.useMicrophonePermissions();
+  const [permissionAudio, requestPermissionAudio] = Audio.usePermissions();
+
+  const startRecording = async () => {
+    
+    await Audio.setAudioModeAsync({
+      allowsRecordingIOS: true,
+      playsInSilentModeIOS: false,
+      staysActiveInBackground: true,
+      interruptionModeIOS: Audio.INTERRUPTION_MODE_IOS_DO_NOT_MIX,
+      shouldDuckAndroid: true,
+      interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
+      playThroughEarpieceAndroid: true,
+    });
+
+    const newRecording = new Audio.Recording();
+    setRecording(newRecording);
+    try {
+      await newRecording.prepareToRecordAsync(Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY);
+      await newRecording.startAsync();
+      console.log('Recording started');
+      Speech.start({ onDone: stopRecording });
+    } catch (error) {
+      console.log('Error starting recording', error);
+    }
+  };
+
+  const stopRecording = async () => {
+    try {
+      console.log('Stopping recording')
+      await recording.stopAndUnloadAsync();
+    } catch (error) {
+      console.log('Error stopping recording', error);
+    }
+  };
 
   React.useEffect(() => {
     if (!canGetAIInfo) {
+      startRecording();
       return;
     }
 
@@ -131,7 +171,9 @@ const Video = () => {
       }
     }
 
-    const interval = setInterval(takePhoto, 5000);
+    const interval = setInterval(takePhoto, 3000);
+
+    requestPermission();
 
     return () => {
       clearInterval(interval);
