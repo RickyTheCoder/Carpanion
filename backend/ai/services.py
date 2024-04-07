@@ -31,7 +31,11 @@ ai_settings = {}
 def set_assistant(setting_pair: str):
     setting = {setting_pair.split("=")[0]: setting_pair.split("=")[1]}
     ai_settings.update(setting)
+<<<<<<< HEAD
+    setting_string = "From now on, you will be a buddy that sits at the shotgun in my car, talking to me like a best friend! Your personality is\n"
+=======
     setting_string = "From now on, you will be a buddy that sits at the shotgun in my car, talking to me like a best friend! You will evolve into an advanced digital road companion, personalizing the interaction with a specific voice and personality in a voice reflecting your personality too. Your personaly is\n"
+>>>>>>> e1fe6e17b83e44340c91e99bb8c4adec67fc6fe6
     for key, value in ai_settings.items():
         setting_string += f"{key}: {value}\n"
     setting_string += "\n"
@@ -158,5 +162,5 @@ def transcribe_audio_v2(audio_path):
     file=audio_file
     )
 
-    
+
     return transcription.text
