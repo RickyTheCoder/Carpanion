@@ -6,8 +6,30 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginScreen from './screens/login';
 import MessageLog from './screens/messagelog';
 import Settings from './screens/settings';
+import ChangePassword from './screens/changepassword'
 import { Ionicons } from '@expo/vector-icons';
 import { Camera, CameraType } from 'expo-camera';
+import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
+
+const TensorCamera = cameraWithTensors(Camera);
+
+
+const handleCameraStream = (images, updatePreview, gl) => {
+  const loop = async () => {
+    const nextImageTensor = images.next().value
+
+    //
+    // do something with tensor here
+    //
+
+    // if autorender is false you need the following two lines.
+    // updatePreview();
+    // gl.endFrameEXP();
+
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
 
 
 const Video = () => {
@@ -47,29 +69,47 @@ const Video = () => {
   /* @end */
 
   function toggleCameraType() {
-    setType(current => (current === CameraType.back ? CameraType.front : CameraType.back));
+    setType(current => (current === Camera.Constants.Type.back ? Camera.Constants.Type.front : Camera.Constants.Type.back));
   }
 
   return (
+    
     <View>
-      <Camera style={styles.camera} type={type}>
+      {/* <Camera style={styles.camera} type={type}> */}
+      <TensorCamera style={styles.camera} 
+      type={Camera.Constants.Type.back}
+      onReady={handleCameraStream}
+      autorender={true}
+      >
+      
+     
       <View>
+      <Ionicons name="camera-reverse-outline" 
+        size={40}
+        style={{
+          marginLeft: "80%",
+          color: 'black',
+          
+          }}/>
       <TouchableOpacity onPress={toggleCameraType}>
           
-            <Ionicons name="camera-reverse-outline" 
-            size={40}
-            style={{
-              marginLeft: "90%",
-              color: 'white'
-              }}/>
-            
+        <Ionicons name="camera-reverse-outline" 
+        size={40}
+        style={{
+          marginLeft: "90%",
+          color: 'black',
           
+          }}/>
       </TouchableOpacity>
-      </View>
+      </View> 
+      </TensorCamera>
+      
+      
+      
        {/*  <TouchableOpacity style={styles.grantButton} onPress={toggleCameraType}>
             <Text style={styles.grantText}>Flip Camera</Text>
         </TouchableOpacity> */}
-      </Camera>
+      
     </View>
     
   );
@@ -77,6 +117,7 @@ const Video = () => {
 import { AuthProvider } from './components/AuthProvider';
 
 import { useAuth } from './components/AuthProvider';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import RegisterScreen from './screens/register';
 
 function HomeScreen() {
@@ -93,7 +134,8 @@ function HomeScreen() {
 
 const Tab = createBottomTabNavigator();
 
-function Tabs () {
+
+function HomeTabs () {
   const { isAuthenticated, token } = useAuth();
 
   return (
@@ -101,9 +143,24 @@ function Tabs () {
         {
           (token != null) ? (
             <>
-              <Tab.Screen name="Home" component={HomeScreen} />
-              <Tab.Screen name="Message Log" component={MessageLog} />
-              <Tab.Screen name="Settings" component={Settings} />
+               <Tab.Screen name="Video Feed" component={HomeScreen} 
+                options={{
+                  tabBarIcon: ({ color, size }) => 
+                  (<Ionicons name="videocam" color={color} size={size} />),
+                }}
+                />
+              <Tab.Screen name="Message Log" component={MessageLog} 
+                options={{
+                  tabBarIcon: ({ color, size }) => 
+                  (<Ionicons name="chatbox" color={color} size={size} />),
+                }}
+              />
+              <Tab.Screen name="Settings" component={Settings} 
+                options={{
+                  tabBarIcon: ({ color, size }) => 
+                  (<Ionicons name="settings-sharp" color={color} size={size} />),
+                }}
+              />
             </>
           ) : (
             <>
@@ -116,18 +173,23 @@ function Tabs () {
       </Tab.Navigator>
   )
 }
+
 export default function App() {
   return (
     <AuthProvider>
-      <NavigationContainer>
-         <Tabs />
-      </NavigationContainer>
-
-     
+    <NavigationContainer>
+    <Stack.Navigator >
+      <Stack.Screen name="Home" component={HomeTabs} options={{headerShown: false}}/>
+      <Stack.Screen name="Change Password" component={ChangePassword} options={{ headerBackTitle: 'Back' }}/>
+      <Stack.Screen name="Login" 
+      component={LoginScreen} 
+      options={{headerBackTitle: 'Back', headerBackTitleStyle: {fontSize: 30,}}}/>  
+       
+    </Stack.Navigator>
+    </NavigationContainer>
     </AuthProvider>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
    

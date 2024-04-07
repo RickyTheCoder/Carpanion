@@ -3,6 +3,7 @@ import { Alert, Modal, Pressable, StyleSheet, Text, View, TouchableOpacity } fro
 import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
 import { useNavigation } from '@react-navigation/native'; 
 import LoginScreen from './login.jsx';
+import { EvilIcons } from '@expo/vector-icons';
 import { useAuth } from '../components/AuthProvider.jsx';
 
   const dataVoice = [
@@ -130,9 +131,13 @@ import { useAuth } from '../components/AuthProvider.jsx';
     const { logout } = useAuth();
   
     const handleLogout = () => {
-      // actually logout TODO
       
+
+      
+      navigation.replace('Login'); 
+
       logout();
+
     };
   
     return (
@@ -147,19 +152,42 @@ import { useAuth } from '../components/AuthProvider.jsx';
     );
   };
 
+  const ChangePword = () => {
+    const navigation = useNavigation();
+  
+    const handleChangePassword = () => {
+      
+      navigation.navigate('Change Password'); 
+    };
+  
+    return (
+      <View>
+        <TouchableOpacity
+          style={styles.passwordButton}
+          onPress={handleChangePassword}
+          underlayColor='#fff'>
+          <View style={{flexDirection:"row"}}>
+            <Text style={styles.passwordText}>Change Password</Text>
+            <EvilIcons style={{marginLeft: 192, marginTop: 13}}name="chevron-right" size={28} color="rgba(0,0,0,0.6)" />
+          </View>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
  
 
 
 
-  export default function MessageLog ()
+  export default function Settings ()
   {
     return (
-    <View>
+    <View style={{backgroundColor:'white'}}>
       <DropdownVoice/>
       <DropdownPersonality/>
       <MultiSelectComponent/>
-
-     <LogoutScreen/>
+      <ChangePword/>
+      <LogoutScreen/>
       
 
     </View>
@@ -175,6 +203,7 @@ import { useAuth } from '../components/AuthProvider.jsx';
     dropdownMultiSelect: {
       height: 50,
       backgroundColor: 'transparent',
+      marginTop: 0,
       borderBottomColor: 'gray',
       borderBottomWidth: 0.5,
     },
@@ -212,8 +241,34 @@ import { useAuth } from '../components/AuthProvider.jsx';
       marginTop: 15,
       marginRight: 155,
       marginLeft: 155,
+      marginBottom: 15,
       backgroundColor:'dodgerblue',
       borderRadius: 15
+    },
+
+    passwordText: {
+      fontSize: 16,
+      textAlign: 'left',
+      paddingTop: 15,
+      paddingBottom: 10
+    
+    },
+    passwordButton: {
+      /* marginTop: 15,
+      marginRight: 155,
+      marginLeft: 155,
+      backgroundColor:'white',
+      borderRadius: 15 */
+      marginTop: 16,
+      marginBottom: 17,
+      backgroundColor: 'white',
+      height: 50,
+      borderColor: 'gray',
+      borderWidth: 0.5,
+      borderRadius: 8,
+      paddingHorizontal: 10,
+      marginLeft: 15,
+      marginRight: 15,
     },
 
     centeredView: {
