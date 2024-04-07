@@ -56,20 +56,13 @@ def text2speech(text):
     pygame.mixer.music.play()
 
 
-def image2text(image_url):
+def image2text(image_data):
     import requests
 
     API_URL = "https://api-inference.huggingface.co/models/hustvl/yolos-tiny"
     headers = {"Authorization": f"Bearer {env('HF_API_TOKEN')}"}
-
-    def query(filename):
-        with open(filename, "rb") as f:
-            data = f.read()
-        response = requests.post(API_URL, headers=headers, data=data)
-        return response.json()
-
-    output = query(image_url)
-    return output
+    response = requests.post(API_URL, headers=headers, data=image_data)
+    return response.json()
 
 
 if __name__ == "__main__":

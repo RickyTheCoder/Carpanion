@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from core.env import env
+import base64
 # Create your views here.
 
 from django.http import FileResponse
@@ -12,6 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 
 import openai
 import speech_recognition as sr
+from .services import text2speech, text2text, image2text
 
 # speech_recognition handles the speech-to-text conversion
 def speech_to_text(audio_file):
@@ -60,7 +62,8 @@ class TranscribeAudioView(APIView):
             file_path = default_storage.path(file_name)
 
             transcription = transcribe_audio(model, file_path)
-
+            response = text2text(transcription)
+            text2speech(response)
             # Clean up the audio file if no longer needed
             default_storage.delete(file_name)
 
@@ -68,3 +71,19 @@ class TranscribeAudioView(APIView):
         
         raise APIException('Audio file is required.', code=400)
         
+
+class ImageToTextView(APIView):
+    def post(self, request):
+        image_data = request.data.get('image')
+        print('image_data obtained from postman')
+        import time; time.sleep(5)
+        print(type(image_data))
+        print(image_data)
+        if not image_data:
+            raise APIException('Image URL is required.', code=400)
+        # base64 encode the image data byte string
+        base64_image = base64.b64decode(image_data.read())
+        print(base64_image[:100])
+
+        output = image2text(base64_image)
+        return Response({'output': output})
