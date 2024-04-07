@@ -95,6 +95,7 @@ const Video = () => {
         setRecording(recording);
 
         // after 5 seconds stop recording
+        await recording.prepareToRecordAsync();
         await recording.startAsync();
 
         setTimeout(() => {
@@ -124,7 +125,7 @@ const Video = () => {
       const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
 
       // send the base64 string to the backend
-      const res = await fetch('http://10.103.232.163:8000/ai/image_to_text/', {
+      const res = await fetch('http://10.103.232.163:8000/ai/conversation/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -135,6 +136,8 @@ const Video = () => {
           longitude: location && location.coords.longitude,
         }),
       });
+
+      console.log(res)
       console.log('Recording stopped and stored at', uri);
 
     } catch (error) {
