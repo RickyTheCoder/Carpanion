@@ -25,9 +25,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = [
-    '10.103.232.163',
-    ]
+ALLOWED_HOSTS = []
 
 SITE_ID = 1
 

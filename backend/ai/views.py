@@ -54,3 +54,32 @@ def speech_request(request):
         return JsonResponse({'text': text, 'gpt_response': response_text})
 
     return JsonResponse({'error': 'Request must be POST.'}, status=400)
+
+
+# backend/ai/views.py
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .transcription import transcribe
+import os
+
+@csrf_exempt  # For demonstration purposes, CSRF token is exempted
+def transcribe_audio(request):
+    if request.method == 'POST' and request.FILES['audio']:
+        # Handle the uploaded file
+        audio_file = request.FILES['audio']
+        audio_file_path = os.path.join('path_to_save_audio_files', audio_file.name)
+        
+        with open(audio_file_path, 'wb+') as destination:
+            for chunk in audio_file.chunks():
+                destination.write(chunk)
+
+        # Transcribe the audio file using Whisper
+        text = transcribe(audio_file_path)
+
+        # Clean up the audio file if no longer needed
+        os.remove(audio_file_path)
+        
+        return JsonResponse({'transcription': text})
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
