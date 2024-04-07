@@ -242,9 +242,7 @@ SOCIALACCOUNT_PROVIDERS = {
 # Rest auth
 
 REST_AUTH = {
-    'USE_JWT': True,
-    'JWT_AUTH_COOKIE': 'auth',
-    'JWT_AUTH_REFRESH_COOKIE': None,
+    'USE_JWT': False,
 
     'JWT_AUTH_SECURE': True,
     'JWT_AUTH_HTTPONLY': False,

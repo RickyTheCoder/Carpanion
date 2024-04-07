@@ -28,7 +28,8 @@ $ python manage.py migrate
 
 5. Run the server
 ```bash
-$ python manage.py runserver
+$ python manage.py runserver 10.103.232.163:8000
 ```
 
 Voila! The server is up and running. You can now access the API at http://localhost:8000/
+
