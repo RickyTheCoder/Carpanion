@@ -6,6 +6,8 @@ from openai import OpenAI
 import pygame
 
 
+
+
 def data_uri_to_blob(data_uri):
     # Split the data URI into parts
     header, data = data_uri.split(',')
@@ -46,14 +48,19 @@ def text2speech(text):
         voice="alloy",
         input=text,
     )
-    speech_file_path = "output.mp3"
-    with open(speech_file_path, "wb") as f:
-        f.write(response.read())
 
-    # play the audio file
-    pygame.mixer.init()
-    pygame.mixer.music.load(speech_file_path)
-    pygame.mixer.music.play()
+    response.stream_to_file("output.mp3")
+
+    #speech_file = io.BytesIO(response.)
+    speech_file_path = "output.mp3"
+    
+    # get the file of output.mp3 as a response to the client
+    with open(speech_file_path, "rb") as f:
+        response = f.read()
+
+    os.remove(speech_file_path)
+
+    return response
 
 
 def image2text(image_data):

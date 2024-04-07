@@ -79,11 +79,39 @@ class ImageToTextView(APIView):
     @parser_classes((JSONParser,))
     def post(self, request):
         image_data = request.data.get('image')
+        camera_is_front_facing = request.data.get('camera_is_front_facing', False)
         if not image_data:
             raise APIException('Image URL is required.', code=400)
         # base64 encode the image data byte string
         base64_image = base64.b64decode(image_data)
 
         output = image2text(base64_image)
-        print(output)
-        return Response({'output': output})
+        
+        labels = []
+
+        # for each detection, get the label
+
+        for detection in output:
+            labels.append(detection['label'])
+
+        # randomly select a label and generate either a fun fact or a joke
+
+        if labels:
+            label = labels[0]
+            
+            prompt = f"""Tell me a fun fact about {label} or tell me a joke about {label}. Only one of the two will be generated. If this value is true: {camera_is_front_facing}, then generate a random compliment about a beautiful person. Make it
+            flow, make it sound natural. It should all be in second person like you're talking to someone.
+            """
+            
+            response = text2text(prompt)
+
+            # get the audio file of the generated text
+
+            audio_file = text2speech(response)
+
+            audio_base64 = base64.b64encode(audio_file).decode('utf-8')
+            
+            return Response({'output': response, 'audio': audio_base64 })
+
+
+        raise APIException('No labels detected.', code=400)
