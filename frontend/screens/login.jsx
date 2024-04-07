@@ -8,20 +8,23 @@ export default function LoginScreen ()
 {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
 
-  const login = () => {
-    const res = fetch('http://localhost:8000/api/v1/auth/login/', {
+  const login = async () => {
+    const res = await fetch('http://10.103.232.163:8000/api/v1/auth/login/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ email, password }),
     })
+    
+
 
     if (res.status === 200) {
       console.log("Login successful")
     } else {
-      console.log("Login failed")
+      console.log(res.headers)
     }
   }
     return (

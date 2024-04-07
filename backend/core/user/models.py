@@ -9,11 +9,11 @@ import uuid
 
 from .managers import UserManager
 
-theme_choices = [
-    ("light", "Light"),
-    ("dark", "Dark"),
-    ("system", "System")
-]
+sex_choices = [
+    ("male", "Male"), 
+    ("female", "Femal"),
+    ("other", "Other"),
+    ]
 
 class User(AbstractUser):
     """
@@ -59,11 +59,11 @@ class UserSettings(models.Model):
     # Language
     language = models.CharField(max_length=8, default="en")
 
-    # Timezone
-    timezone = models.CharField(max_length=64, default="UTC")
+    # Age
+    age = models.PositiveIntegerField(default=25)
 
-    # Theme
-    theme = models.CharField(max_length=64, default="system", choices=theme_choices)
+    # Sex
+    sex = models.CharField(choices=sex_choices, default="other")
 
     class Meta:
         verbose_name = "User Settings"
