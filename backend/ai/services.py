@@ -6,6 +6,11 @@ from openai import OpenAI
 import pygame
 
 
+# Create an OpenAI client
+client = OpenAI(
+    # read from .env.local file
+    api_key=env("OPENAI_API_KEY")
+)
 
 
 def data_uri_to_blob(data_uri):
@@ -21,27 +26,18 @@ def data_uri_to_blob(data_uri):
     # Create a BytesIO object and return it
     return io.BytesIO(byte_string), mime_type
 
+messages = []
 def text2text(text):
-    # Create an OpenAI client
-    client = OpenAI(
-        # read from .env.local file
-        api_key=env("OPENAI_API_KEY")
-    )
-
+    messages.append({"role": "user", "content": text})
     chat_completion = client.chat.completions.create(
-        messages=[
-            {
-                "role": "user",
-                "content": text,
-            }
-        ],
-        model="gpt-4",
+        messages=messages,
+        model="gpt-4-turbo",
     )
     response = chat_completion.choices[0].message.content
+    messages.append({"role": "assistant", "content": response})
     return response
 
 def text2speech(text):
-    client = OpenAI()
 
     response = client.audio.speech.create(
         model="tts-1",

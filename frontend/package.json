@@ -28,6 +28,7 @@
     "expo-status-bar": "~1.11.1",
     "metro-runtime": "^0.80.8",
     "react": "18.2.0",
+    "react-dom": "^18.2.0",
     "react-native": "0.73.6",
     "react-native-element-dropdown": "^2.10.4",
     "react-native-fs": "^2.20.0",
