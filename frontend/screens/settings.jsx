@@ -3,6 +3,7 @@ import { Alert, Modal, Pressable, StyleSheet, Text, View, TouchableOpacity } fro
 import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
 import { useNavigation } from '@react-navigation/native'; 
 import LoginScreen from './login.jsx';
+import { useAuth } from '../components/AuthProvider.jsx';
 
   const dataVoice = [
     { label: 'British Male', value: 'britishmale' },
@@ -126,11 +127,12 @@ import LoginScreen from './login.jsx';
 
   const LogoutScreen = () => {
     const navigation = useNavigation();
+    const { logout } = useAuth();
   
     const handleLogout = () => {
       // actually logout TODO
       
-      navigation.navigate('Login'); 
+      logout();
     };
   
     return (
