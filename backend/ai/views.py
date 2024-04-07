@@ -14,7 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 
 import openai
 import speech_recognition as sr
-from .services import text2speech, text2text, image2text
+from .services import text2speech, text2text, image2text, transcribe_audio_with_whisper, transcribe_audio, transcribe_audio_v2
 
 # speech_recognition handles the speech-to-text conversion
 def speech_to_text(audio_file):
@@ -86,10 +86,7 @@ def get_location(lat, lon):
     response = requests.get(f'https://api.api-ninjas.com/v1/reversegeocoding?lat={lat}&lon={lon}', headers={
         'X-Api-Key': api_ninja_key
     }).json()
-    location_data = response[0]
-
-    print(location_data)
-    
+    location_data = response[0]    
     return location_data
 
 class ImageToTextView(APIView):
@@ -136,7 +133,6 @@ class ImageToTextView(APIView):
             return Response({'output': response, 'audio': audio_base64 })
         
         else:
-            print(location)
             if location:
                 prompt = f"""
                 Generate a fun fact or joke about {location['name']}, {location['country']}, {location.get('state', '')}.
@@ -154,3 +150,37 @@ class ImageToTextView(APIView):
 
 
         raise APIException('No labels detected.', code=400)
+
+
+class ConversationView(APIView):
+    @parser_classes((JSONParser,))
+    def post(self, request):
+        from pydub import AudioSegment
+        
+        lat, lon = request.data.get('latitude'), request.data.get('longitude')
+        
+        location = get_location(lat, lon)
+
+        audio_file = request.data.get('audio')
+
+        if not audio_file:
+            raise APIException('Audio is required.', code=400)
+        # base64 encode the image data byte string
+        base64_audio = base64.b64decode(audio_file)
+
+        # create a audio file from the base64 audio data
+        open('audio.m4a', 'wb').write(base64_audio)
+
+        # convert the m4a file to mp3
+        audio = AudioSegment.from_file('audio.m4a')
+        audio.export('audio.wav', format='wav')
+
+        # use the file path to transcribe the audio
+
+        output = transcribe_audio_v2(audio_path='audio.wav')
+
+        print(output)
+    
+        # randomly select a label and generate either a fun fact or a joke
+
+        return Response({'output': output})

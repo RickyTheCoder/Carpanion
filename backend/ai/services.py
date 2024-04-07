@@ -31,7 +31,7 @@ def text2text(text):
     messages.append({"role": "user", "content": text})
     chat_completion = client.chat.completions.create(
         messages=messages,
-        model="gpt-4-turbo",
+        model="gpt-4",
     )
     response = chat_completion.choices[0].message.content
     messages.append({"role": "assistant", "content": response})
@@ -128,3 +128,14 @@ def transcribe_audio_with_whisper(audio_file_path):
         )
     return transcription["text"]
 
+def transcribe_audio_v2(audio_path):
+    # Transcribe the audio file using Whisper
+
+    audio_file= open(audio_path, "rb")
+    transcription = client.audio.transcriptions.create(
+    model="whisper-1", 
+    file=audio_file
+    )
+
+    
+    return transcription.text
