@@ -18,9 +18,23 @@ const handleCameraStream = (images, updatePreview, gl) => {
   const loop = async () => {
     const nextImageTensor = images.next().value
 
-    //
-    // do something with tensor here
-    //
+    console.log(images)
+    
+
+    // send image to api backend
+
+    const response = await fetch('http://10.103.232.163:8000/ai/image_to_text/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ image: nextImageTensor }),
+    });
+    
+
+    // do something with the response
+    const data = await response.json();
+    console.log(data);
 
     // if autorender is false you need the following two lines.
     // updatePreview();
@@ -28,11 +42,12 @@ const handleCameraStream = (images, updatePreview, gl) => {
 
     requestAnimationFrame(loop);
   }
-  loop();
+  setInterval(loop, 4000);
 }
 
 
 const Video = () => {
+  const cameraRef = React.useRef(null);
   const [type, setType] = useState(CameraType.back);
   
   const requestPermission = async () => {
@@ -41,6 +56,32 @@ const Video = () => {
   };
   const [permissionCamera, requestPermissionCamera] = Camera.useCameraPermissions();
   const [permissionMicrophone, requestPermissionMicrophone] = Camera.useMicrophonePermissions();
+
+  React.useEffect(() => {
+    const takePhoto = async () => {
+      if (cameraRef.current) {
+        let photo = await cameraRef.current.takePictureAsync({
+          base64: true,
+        });
+
+
+        // send photo to api backend
+
+        const response = await fetch('http://10.103.232.163:8000/ai/image_to_text/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ image: photo.base64 }),
+        });
+
+        // do something with the response
+
+      }
+    }
+
+    setInterval(takePhoto, 5000);
+  })
 
   
   /* @hide if (!permission) ... */
@@ -75,22 +116,12 @@ const Video = () => {
   return (
     
     <View>
-      {/* <Camera style={styles.camera} type={type}> */}
-      <TensorCamera style={styles.camera} 
-      type={Camera.Constants.Type.back}
-      onReady={handleCameraStream}
-      autorender={true}
-      >
+      <Camera ref={cameraRef} style={styles.camera} type={type}
       
-     
+      >
+
       <View>
-      <Ionicons name="camera-reverse-outline" 
-        size={40}
-        style={{
-          marginLeft: "80%",
-          color: 'black',
-          
-          }}/>
+    
       <TouchableOpacity onPress={toggleCameraType}>
           
         <Ionicons name="camera-reverse-outline" 
@@ -102,7 +133,7 @@ const Video = () => {
           }}/>
       </TouchableOpacity>
       </View> 
-      </TensorCamera>
+      </Camera>
       
       
       
@@ -164,8 +195,8 @@ function HomeTabs () {
             </>
           ) : (
             <>
-            <Tab.Screen name="Register" component={RegisterScreen} />
             <Tab.Screen name="Login" component={LoginScreen} />
+            <Tab.Screen name="Register" component={RegisterScreen} />
             </>
           )
         
