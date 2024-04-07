@@ -70,18 +70,19 @@ from django.core.files.storage import default_storage
 
 model = load_whisper_model()
 
-@csrf_exempt
-def transcribe_audio_request(request):
-    if request.method == 'POST' and request.FILES['audio']:
-        audio_file = request.FILES['audio']
-        file_name = default_storage.save(audio_file.name, audio_file)
-        file_path = default_storage.path(file_name)
+class TranscribeAudioView(APIView):
+    def post(self, request):
+        if request.FILES.get('audio'):
+            audio_file = request.FILES['audio']
+            file_name = default_storage.save(audio_file.name, audio_file)
+            file_path = default_storage.path(file_name)
 
-        transcription = transcribe_audio(model, file_path)
+            transcription = transcribe_audio(model, file_path)
 
-        # Clean up the audio file if no longer needed
-        default_storage.delete(file_name)
+            # Clean up the audio file if no longer needed
+            default_storage.delete(file_name)
 
-        return JsonResponse({'transcription': transcription})
-
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+            return Response({'transcription': transcription})
+        
+        raise APIException('Audio file is required.', code=400)
+        
