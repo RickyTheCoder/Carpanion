@@ -6,6 +6,9 @@ import LoginScreen from './screens/login';
 import MessageLog from './screens/messagelog';
 import Settings from './screens/settings';
 import { Ionicons } from '@expo/vector-icons';
+import { AuthProvider } from './components/AuthProvider';
+
+import { useAuth } from './components/AuthProvider';
 
 function HomeScreen() {
   return (
@@ -20,29 +23,37 @@ function HomeScreen() {
 const Tab = createBottomTabNavigator();
 
 export default function App() {
+  const { isAuthenticated } = useAuth();
   return (
-    <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen name="Video Feed" component={HomeScreen} 
-        options={{
-          tabBarIcon: ({ color, size }) => 
-          (<Ionicons name="videocam" color={color} size={size} />),
-        }}
-        />
-        <Tab.Screen name="Message Log" component={MessageLog} 
-        options={{
-          tabBarIcon: ({ color, size }) => 
-          (<Ionicons name="chatbox" color={color} size={size} />),
-        }}
-        />
-        <Tab.Screen name="Settings" component={Settings} 
-        options={{
-          tabBarIcon: ({ color, size }) => 
-          (<Ionicons name="settings-sharp" color={color} size={size} />),
-        }}
-        />
-        <Tab.Screen name="Login" component={LoginScreen} />
-      </Tab.Navigator>
-    </NavigationContainer>
+    <AuthProvider>
+
+      <NavigationContainer>
+        { !isAuthenticated ? (
+          <Tab.Navigator>
+          <Tab.Screen name="Video Feed" component={HomeScreen} 
+          options={{
+            tabBarIcon: ({ color, size }) => 
+            (<Ionicons name="videocam" color={color} size={size} />),
+          }}
+          />
+          <Tab.Screen name="Message Log" component={MessageLog} 
+          options={{
+            tabBarIcon: ({ color, size }) => 
+            (<Ionicons name="chatbox" color={color} size={size} />),
+          }}
+          />
+          <Tab.Screen name="Settings" component={Settings} 
+          options={{
+            tabBarIcon: ({ color, size }) => 
+            (<Ionicons name="settings-sharp" color={color} size={size} />),
+          }}
+          />
+        </Tab.Navigator>
+        ) : (
+          <LoginScreen />
+        ) }
+       
+      </NavigationContainer>
+    </AuthProvider>
   );
 }
