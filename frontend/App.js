@@ -10,7 +10,8 @@ import ChangePassword from './screens/changepassword'
 import { Ionicons } from '@expo/vector-icons';
 import { Camera, CameraType } from 'expo-camera';
 import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
-import RNFetchBlob from 'rn-fetch-blob';
+import { Audio } from 'expo-av';
+import * as FileSystem from 'expo-file-system';
 
 const TensorCamera = cameraWithTensors(Camera);
 
@@ -60,6 +61,10 @@ const Video = () => {
   const [permissionMicrophone, requestPermissionMicrophone] = Camera.useMicrophonePermissions();
 
   React.useEffect(() => {
+    if (!canGetAIInfo) {
+      return;
+    }
+
     const takePhoto = async () => {
       if (!canGetAIInfo) {
         return;
@@ -81,39 +86,58 @@ const Video = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ image: photo.base64 }),
+          body: JSON.stringify({ 
+            image: photo.base64, 
+            camera_is_front_facing: type === Camera.Constants.Type.front 
+          }),
         })
+
+        if (!res.ok) {
+          console.log('Error sending image to backend');
+          setCanGetAIInfo(true);
+          return;
+        }
 
         const data = await res.json();
 
-        console.log(data.output)
+        const path = FileSystem.documentDirectory + 'audio.mp3';
 
-        const dirs = RNFetchBlob.fs.dirs;
-        const path = `${dirs.DocumentDir}/audio.mp3`;
+        const audioBase64 = data.audio;
 
-        await RNFetchBlob.fs.writeFile(path, data.audio, 'base64');
+      // write the base64 audio data to a file
+      await FileSystem.writeAsStringAsync(path, audioBase64, { encoding: FileSystem.EncodingType.Base64 });
 
-        const sound = new Sound(path, '', (error) => {
-          if (error) {
-            console.log('failed to load the sound', error);
-            return;
+            // create a new sound object
+      const soundObject = new Audio.Sound();
+
+      try {
+        // load the sound from the file
+        await soundObject.loadAsync({ uri: path });
+
+        // play the sound
+
+        soundObject.setOnPlaybackStatusUpdate((status) => {
+          if (status.didJustFinish) {
+            soundObject.unloadAsync();
+            setCanGetAIInfo(true);
           }
-        
-          // play the sound
-          sound.play((success) => {
-            if (!success) {
-              console.log('Sound did not play successfully');
-            }
-          });
         });
-
-        setCanGetAIInfo(true);
+        
+        await soundObject.playAsync();
+      } catch (error) {
+        console.log('Error playing sound', error);
+      }
 
       }
     }
 
-    setInterval(takePhoto, 5000);
-  })
+    const interval = setInterval(takePhoto, 5000);
+
+    return () => {
+      clearInterval(interval);
+    }
+    
+  }, [canGetAIInfo]);
 
   
   /* @hide if (!permission) ... */
