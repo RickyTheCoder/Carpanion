@@ -47,6 +47,9 @@ SITE_ID = 1
 # Application definition
 
 INSTALLED_APPS = [
+    # AI apps
+    'ai',
+
     # Local apps
 
     'core.application',
@@ -80,9 +83,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-
-    'ai'
-
 ]
 
 MIDDLEWARE = [

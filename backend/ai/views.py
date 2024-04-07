@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 
 import openai
 import speech_recognition as sr
+from .services import text2speech, text2text, image2text
 
 # speech_recognition handles the speech-to-text conversion
 def speech_to_text(audio_file):
@@ -58,7 +59,8 @@ class TranscribeAudioView(APIView):
             file_path = default_storage.path(file_name)
 
             transcription = transcribe_audio(model, file_path)
-
+            response = text2text(transcription)
+            text2speech(response)
             # Clean up the audio file if no longer needed
             default_storage.delete(file_name)
 
