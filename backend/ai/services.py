@@ -56,7 +56,24 @@ def text2speech(text):
     pygame.mixer.music.play()
 
 
+def image2text(image_url):
+    import requests
+
+    API_URL = "https://api-inference.huggingface.co/models/hustvl/yolos-tiny"
+    headers = {"Authorization": f"Bearer {env('HF_API_TOKEN')}"}
+
+    def query(filename):
+        with open(filename, "rb") as f:
+            data = f.read()
+        response = requests.post(API_URL, headers=headers, data=data)
+        return response.json()
+
+    output = query(image_url)
+    return output
+
+
 if __name__ == "__main__":
+    image2text("cat_dog.jpg")
     text2speech(text2text("Say this is a test"))
 
     # # Create a chat model
@@ -88,3 +105,16 @@ if __name__ == "__main__":
 
     # Parse the response
     # ...
+
+import whisper
+
+def load_whisper_model():
+    # Load the Whisper model
+    # Choose the model size appropriate for your use case and hardware
+    model = whisper.load_model("base")
+    return model
+
+def transcribe_audio(model, audio_path):
+    # Transcribe the audio file using Whisper
+    result = model.transcribe(audio_path)
+    return result["text"]

@@ -4,6 +4,7 @@ import { Dropdown, MultiSelect } from 'react-native-element-dropdown';
 import { useNavigation } from '@react-navigation/native'; 
 import LoginScreen from './login.jsx';
 import { EvilIcons } from '@expo/vector-icons';
+import { useAuth } from '../components/AuthProvider.jsx';
 
   const dataVoice = [
     { label: 'British Male', value: 'britishmale' },
@@ -127,11 +128,16 @@ import { EvilIcons } from '@expo/vector-icons';
 
   const LogoutScreen = () => {
     const navigation = useNavigation();
+    const { logout } = useAuth();
   
     const handleLogout = () => {
       
+
       
       navigation.replace('Login'); 
+
+      logout();
+
     };
   
     return (

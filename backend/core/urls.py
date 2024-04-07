@@ -27,5 +27,6 @@ urlpatterns = [
     path('api/v1/auth/', include('dj_rest_auth.urls')),
     path('api/v1/auth/registration/', include('dj_rest_auth.registration.urls')),
     path('api/v1/auth/knox/', include('knox.urls')),
+    path('ai/', include('ai.urls')),
     # Local apps
 ]

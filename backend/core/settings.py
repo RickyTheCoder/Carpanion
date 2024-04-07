@@ -25,7 +25,13 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '10.103.232.163',
+    '10.105.61.235',
+    '10.105.222.72',
+    '127.0.0.1',
+    'localhost',
+]
 
 SITE_ID = 1
 
@@ -65,7 +71,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites'
+    'django.contrib.sites',
+
+    'ai'
+
 ]
 
 MIDDLEWARE = [
@@ -241,6 +250,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 REST_AUTH = {
     'USE_JWT': False,
+    'SESSION_LOGIN': False,
 
     'JWT_AUTH_SECURE': True,
     'JWT_AUTH_HTTPONLY': False,
@@ -248,7 +258,6 @@ REST_AUTH = {
 
     'LOGIN_SERIALIZER': 'core.user.serializers.login.UserLoginSerializer',
     'REGISTER_SERIALIZER': 'core.user.serializers.register.UserRegisterSerializer',
-    'JWT_TOKEN_CLAIMS_SERIALIZER': 'core.auth.serializers.tokens.TokenObtainPairSerializer'
 
 }
 
@@ -270,7 +279,9 @@ REST_KNOX = {
 
 # CORS
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ORIGIN_WHITELIST = [
-    'http://10.103.232.163:8081'
+    'http://10.103.232.163:8081',
+     'http://10.105.61.235:8081',
+    'http://localhost:8000',
 ]

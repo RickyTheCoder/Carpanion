@@ -118,6 +118,7 @@ import { AuthProvider } from './components/AuthProvider';
 
 import { useAuth } from './components/AuthProvider';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import RegisterScreen from './screens/register';
 
 function HomeScreen() {
   return (
@@ -132,51 +133,50 @@ function HomeScreen() {
 
 
 const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
-function HomeTabs() {
-  const { isAuthenticated } = useAuth();
+
+
+function HomeTabs () {
+  const { isAuthenticated, token } = useAuth();
+
   return (
-    <AuthProvider>
-
-        { isAuthenticated ? (
-          <Tab.Navigator>
-          <Tab.Screen name="Video Feed" component={HomeScreen} 
-          options={{
-            tabBarIcon: ({ color, size }) => 
-            (<Ionicons name="videocam" color={color} size={size} />),
-          }}
-          />
-          <Tab.Screen name="Message Log" component={MessageLog} 
-          options={{
-            tabBarIcon: ({ color, size }) => 
-            (<Ionicons name="chatbox" color={color} size={size} />),
-          }}
-          />
-          <Tab.Screen name="Settings" component={Settings} 
-          options={{
-            tabBarIcon: ({ color, size }) => 
-            (<Ionicons name="settings-sharp" color={color} size={size} />),
-          }}
-          />
-        </Tab.Navigator>
-        ) : (
-          <LoginScreen />
-        ) }
-
-      
-
-     {/*  <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="Login" component={LoginScreen}/>
-        </Stack.Navigator>
-      </NavigationContainer> */}
-    </AuthProvider>
-  );
+      <Tab.Navigator>
+        {
+          (token != null) ? (
+            <>
+               <Tab.Screen name="Video Feed" component={HomeScreen} 
+                options={{
+                  tabBarIcon: ({ color, size }) => 
+                  (<Ionicons name="videocam" color={color} size={size} />),
+                }}
+                />
+              <Tab.Screen name="Message Log" component={MessageLog} 
+                options={{
+                  tabBarIcon: ({ color, size }) => 
+                  (<Ionicons name="chatbox" color={color} size={size} />),
+                }}
+              />
+              <Tab.Screen name="Settings" component={Settings} 
+                options={{
+                  tabBarIcon: ({ color, size }) => 
+                  (<Ionicons name="settings-sharp" color={color} size={size} />),
+                }}
+              />
+            </>
+          ) : (
+            <>
+            <Tab.Screen name="Register" component={RegisterScreen} />
+            <Tab.Screen name="Login" component={LoginScreen} />
+            </>
+          )
+        
+        }
+      </Tab.Navigator>
+  )
 }
 
 export default function App() {
   return (
+    <AuthProvider>
     <NavigationContainer>
     <Stack.Navigator >
       <Stack.Screen name="Home" component={HomeTabs} options={{headerShown: false}}/>
@@ -187,6 +187,7 @@ export default function App() {
        
     </Stack.Navigator>
     </NavigationContainer>
+    </AuthProvider>
   );
 }
 const styles = StyleSheet.create({
