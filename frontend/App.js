@@ -10,6 +10,7 @@ import ChangePassword from './screens/changepassword'
 import { Ionicons } from '@expo/vector-icons';
 import { Camera, CameraType } from 'expo-camera';
 import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
+import RNFetchBlob from 'rn-fetch-blob';
 
 const TensorCamera = cameraWithTensors(Camera);
 
@@ -49,6 +50,7 @@ const handleCameraStream = (images, updatePreview, gl) => {
 const Video = () => {
   const cameraRef = React.useRef(null);
   const [type, setType] = useState(CameraType.back);
+  const [canGetAIInfo, setCanGetAIInfo] = useState(true);
   
   const requestPermission = async () => {
     const cameraGranted = await requestPermissionCamera();
@@ -59,7 +61,14 @@ const Video = () => {
 
   React.useEffect(() => {
     const takePhoto = async () => {
+      if (!canGetAIInfo) {
+        return;
+      }
+
       if (cameraRef.current) {
+
+        setCanGetAIInfo(false);
+        
         let photo = await cameraRef.current.takePictureAsync({
           base64: true,
         });
@@ -67,15 +76,38 @@ const Video = () => {
 
         // send photo to api backend
 
-        const response = await fetch('http://10.103.232.163:8000/ai/image_to_text/', {
+        const res = await fetch('http://10.103.232.163:8000/ai/image_to_text/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ image: photo.base64 }),
+        })
+
+        const data = await res.json();
+
+        console.log(data.output)
+
+        const dirs = RNFetchBlob.fs.dirs;
+        const path = `${dirs.DocumentDir}/audio.mp3`;
+
+        await RNFetchBlob.fs.writeFile(path, data.audio, 'base64');
+
+        const sound = new Sound(path, '', (error) => {
+          if (error) {
+            console.log('failed to load the sound', error);
+            return;
+          }
+        
+          // play the sound
+          sound.play((success) => {
+            if (!success) {
+              console.log('Sound did not play successfully');
+            }
+          });
         });
 
-        // do something with the response
+        setCanGetAIInfo(true);
 
       }
     }

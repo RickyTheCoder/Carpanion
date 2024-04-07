@@ -315,57 +315,6 @@ import { useAuth } from '../components/AuthProvider.jsx';
     },
   });
 
-/*
-
-import React, { useState } from 'react';
-import RNPickerSelect from 'react-native-picker-select';
-//import {Picker} from '@react-native-picker/picker';
-import { View, Text } from 'react-native';
-
-
-export default function Settings ()
-{
-  const [selectedVoice, setSelectedVoice] = useState(null);
-
-  const placeholder = {
-    label: 'Select option',
-    value: null,
-  };
-
-  const options = [
-    { label: 'Option 1', value: 'option1' },
-    { label: 'Option 2', value: 'option2' },
-    { label: 'Option 3', value: 'option3' },
-  ];
-
-  return (
-    <View>
-      <Text>Select an option:</Text>
-      <RNPickerSelect
-        placeholder={placeholder}
-        items={options}
-        onValueChange={(value) => setSelectedVoice(value)}
-        value={selectedVoice}
-      />
-      {selectedVoice && <Text>Selected: {selectedVoice}</Text>}
-    </View>
-  );
-  /*
-  //const [selectedVoice, setSelectedVoice] = useState();
-  return (
-    <Picker
-        selectedValue={selectedVoice}
-        onValueChange={(itemValue, itemIndex) =>
-          setSelectedVoice(itemValue)
-        }>
-        <Picker.Item label="British Male" value="britishmale" />
-        <Picker.Item label="British Female" value="britishfemale" />
-    </Picker> 
-  );
-  
-} */
-
-import React from 'react';
 import ImageUploader from '../components/ImageUploader';
 
 const SettingsScreen = () => {
