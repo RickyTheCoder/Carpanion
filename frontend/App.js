@@ -131,8 +131,6 @@ const Video = () => {
 
         // send photo to api backend
 
-        console.log(location && location.coords.latitude);
-
         const res = await fetch('http://10.103.232.163:8000/ai/image_to_text/', {
           method: 'POST',
           headers: {
