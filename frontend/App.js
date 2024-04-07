@@ -133,7 +133,7 @@ function HomeScreen() {
 
 
 const Tab = createBottomTabNavigator();
-
+const Stack = createNativeStackNavigator();
 
 function HomeTabs () {
   const { isAuthenticated, token } = useAuth();
