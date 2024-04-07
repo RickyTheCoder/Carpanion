@@ -9,10 +9,18 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
+import os
+
+# load environment variables from the .env file
+# safely use the environment variable
+
 
 from pathlib import Path
 from datetime import timedelta
 from .env import ( env, BASE_DIR )
+
+OPENAI_API_KEY = env('OPENAI_API_KEY')
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
@@ -285,3 +293,4 @@ CORS_ORIGIN_WHITELIST = [
      'http://10.105.61.235:8081',
     'http://localhost:8000',
 ]
+

@@ -12,3 +12,4 @@ class TranscriptionTestCase(TestCase):
         pdb.set_trace()
         transcription = transcribe(audio_file_path)
         self.assertIsNotNone(transcription)
+

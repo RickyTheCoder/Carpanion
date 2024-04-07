@@ -118,3 +118,17 @@ def transcribe_audio(model, audio_path):
     # Transcribe the audio file using Whisper
     result = model.transcribe(audio_path)
     return result["text"]
+    
+ # service function for transcription    
+import openai
+
+openai.api_key = 'OPENAI_API_KEY'
+
+def transcribe_audio_with_whisper(audio_file_path):
+    with open(audio_file_path, "rb") as audio_file:
+        transcription = openai.Audio.transcriptions.create(
+            model="whisper-1", 
+            file=audio_file
+        )
+    return transcription["text"]
+
