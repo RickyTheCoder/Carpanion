@@ -14,7 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 
 import openai
 import speech_recognition as sr
-from .services import text2speech, text2text, image2text, transcribe_audio_with_whisper, transcribe_audio, transcribe_audio_v2
+from .services import text2speech, text2text, image2text, transcribe_audio_with_whisper, transcribe_audio, transcribe_audio_v2, set_assistant
 
 # speech_recognition handles the speech-to-text conversion
 def speech_to_text(audio_file):
@@ -184,3 +184,9 @@ class ConversationView(APIView):
         # randomly select a label and generate either a fun fact or a joke
 
         return Response({'output': output})
+class SettingsView(APIView):
+    def post(self, request):
+        setting_string = request.data.get('setting_pair')
+        if not setting_string:
+            raise APIException('Setting string is required.', code=400)
+        set_assistant(setting_string)

@@ -5,7 +5,15 @@ import { useNavigation } from '@react-navigation/native';
 import LoginScreen from './login.jsx';
 import { EvilIcons } from '@expo/vector-icons';
 import { useAuth } from '../components/AuthProvider.jsx';
-
+  const set_assistant = async function (key, value) {
+    const _string = key + "=" + value;
+    await fetch('http://10.103.232.163:8000/ai/set_assistant/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ setting_pair : _string }),
+  })};
   const dataVoice = [
     { label: 'British Male', value: 'britishmale' },
     { label: 'British Female', value: 'britishfemale' },
@@ -90,6 +98,7 @@ import { useAuth } from '../components/AuthProvider.jsx';
           onChange={item => {
             setValue(item.value);
             setIsFocus(false);
+            set_assistant(item.value);
           }}
         />
       </View>

@@ -9,7 +9,7 @@ import pygame
 # Create an OpenAI client
 client = OpenAI(
     # read from .env.local file
-    api_key=env("OPENAI_API_KEY")
+    api_key=env("OPENAI_API_KEY"),
 )
 
 
@@ -27,6 +27,24 @@ def data_uri_to_blob(data_uri):
     return io.BytesIO(byte_string), mime_type
 
 messages = []
+ai_settings = {}
+def set_assistant(setting_pair: str):
+    setting = {setting_pair.split("=")[0]: setting_pair.split("=")[1]}
+    ai_settings.update(setting)
+    setting_string = "From now on, you will be a buddy that sits at the shotgun in my car, talking to me like a best friend! Your personaly is\n"
+    for key, value in ai_settings.items():
+        setting_string += f"{key}: {value}\n"
+    setting_string += "\n"
+    print("setting_string:", setting_string)
+    if len(messages) > 0:
+        # assert messages[0]["role"] == "system"
+        if messages[0]["role"] != "system":
+            messages.append({"role": "system", "content": setting_string})
+        else:
+            messages[0] = {"role": "system", "content": setting_string}
+    else:
+        messages.append({"role": "system", "content": setting_string})
+
 def text2text(text):
     messages.append({"role": "user", "content": text})
     chat_completion = client.chat.completions.create(
