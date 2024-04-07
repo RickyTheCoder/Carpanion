@@ -207,3 +207,5 @@ class SettingsView(APIView):
         if not setting_string:
             raise APIException('Setting string is required.', code=400)
         set_assistant(setting_string)
+
+        return Response({'message': 'Settings updated.'})
