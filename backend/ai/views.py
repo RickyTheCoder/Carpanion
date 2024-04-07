@@ -1,7 +1,6 @@
 from django.shortcuts import render
 from core.env import env
 import base64
-# Create your views here.
 
 from django.http import FileResponse
 
@@ -71,8 +70,13 @@ class TranscribeAudioView(APIView):
         
         raise APIException('Audio file is required.', code=400)
         
+#ensure that Django view can parse JSON data correctly
+
+from rest_framework.parsers import JSONParser
+from rest_framework.decorators import parser_classes
 
 class ImageToTextView(APIView):
+    @parser_classes((JSONParser,))
     def post(self, request):
         image_data = request.data.get('image')
         print('image_data obtained from postman')

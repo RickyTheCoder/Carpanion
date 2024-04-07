@@ -364,3 +364,15 @@ export default function Settings ()
   );
   
 } */
+
+import React from 'react';
+import ImageUploader from '../components/ImageUploader';
+
+const SettingsScreen = () => {
+  return (
+    <div>
+      <ImageUploader />
+    </div>
+  );
+};
+
