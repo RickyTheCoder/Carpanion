@@ -56,7 +56,24 @@ def text2speech(text):
     pygame.mixer.music.play()
 
 
+def image2text(image_url):
+    import requests
+
+    API_URL = "https://api-inference.huggingface.co/models/hustvl/yolos-tiny"
+    headers = {"Authorization": f"Bearer {env("HF_API_TOKEN")}"}
+
+    def query(filename):
+        with open(filename, "rb") as f:
+            data = f.read()
+        response = requests.post(API_URL, headers=headers, data=data)
+        return response.json()
+
+    output = query(image_url)
+    return output
+
+
 if __name__ == "__main__":
+    image2text("cat_dog.jpg")
     text2speech(text2text("Say this is a test"))
 
     # # Create a chat model
