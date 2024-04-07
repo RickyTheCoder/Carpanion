@@ -44,26 +44,6 @@ def process_with_gpt(text):
     return response.choices[0].text.strip()
 
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from django.core.files.storage import default_storage
-
-@csrf_exempt
-def speech_request(request):
-    if request.method == 'POST':
-        audio_file = request.FILES['audio']
-        file_name = default_storage.save(audio_file.name, audio_file)
-        file_path = default_storage.path(file_name)
-
-        text = speech_to_text(file_path)
-        response_text = process_with_gpt(text)
-
-        return JsonResponse({'text': text, 'gpt_response': response_text})
-
-    return JsonResponse({'error': 'Request must be POST.'}, status=400)
-
-# ai/views.py
-
-from django.http import JsonResponse
 from .services import load_whisper_model, transcribe_audio
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.storage import default_storage
@@ -78,6 +58,30 @@ def transcribe_audio_request(request):
         file_path = default_storage.path(file_name)
 
         transcription = transcribe_audio(model, file_path)
+
+        # Clean up the audio file if no longer needed
+        default_storage.delete(file_name)
+
+        return JsonResponse({'transcription': transcription})
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+# end point handles audio file uploads and use transcription 
+
+from django.http import JsonResponse
+from .services import transcribe_audio_with_whisper
+from django.views.decorators.csrf import csrf_exempt
+from django.core.files.storage import default_storage
+
+@csrf_exempt
+def speech_request(request):
+    if request.method == 'POST' and request.FILES['audio']:
+        audio_file = request.FILES['audio']
+        file_name = default_storage.save(audio_file.name, audio_file)
+        file_path = default_storage.path(file_name)
+
+        transcription = transcribe_audio_with_whisper(file_path)
 
         # Clean up the audio file if no longer needed
         default_storage.delete(file_name)
