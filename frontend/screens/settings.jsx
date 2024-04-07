@@ -72,6 +72,7 @@ import { useAuth } from '../components/AuthProvider.jsx';
     { label: 'Sassy',  value: 'sassy'},
     { label: 'Flirting',  value: 'flirting'},
     { label: 'Angry',  value: 'angry'},
+    { label: 'Condescending',  value: 'condescending'},
     { label: 'In Love', value: 'in_love'},
     { label: 'Crazy', value: 'crazy'},
     { label: 'Stand-up Comedian',  value: 'stand_up_comedian'},
