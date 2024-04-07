@@ -118,9 +118,11 @@ class ImageToTextView(APIView):
         if labels:
             label = labels[0]
             
-            prompt = f"""Tell me a fun fact about {label} or tell me a joke about {label}. Only one of the two will be generated.
-            
-            """
+            prompt = f"""You have to do one of the actions:
+            1. enhances my driving experience through navigational assistance and safety
+            2. sharing light-hearted dad jokes about {label}
+            3. offer a fun fact about {label}
+            One of the above three will be generated."""
             
             response = text2text(prompt)
 

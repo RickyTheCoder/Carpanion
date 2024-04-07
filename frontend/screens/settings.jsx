@@ -64,6 +64,22 @@ import { useAuth } from '../components/AuthProvider.jsx';
   const dataPersonality = [
     { label: 'Happy', value: 'happy' },
     { label: 'Sad', value: 'sad' },
+    { label: 'Sarcastic',  value: 'sarcastic'},
+    { label: 'Best homie',  value: 'best_homie'},
+    { label: 'Professional',  value: 'professional'},
+    { label: 'Funny',  value: 'funny'},
+    { label: 'Gangster',  value: 'gangster'},
+    { label: 'Nerdy',  value: 'nerdy'},
+    { label: 'Sassy',  value: 'sassy'},
+    { label: 'Flirting',  value: 'flirting'},
+    { label: 'Angry',  value: 'angry'},
+    { label: 'Condescending',  value: 'condescending'},
+    { label: 'In Love', value: 'in_love'},
+    { label: 'Crazy', value: 'crazy'},
+    { label: 'Stand-up Comedian',  value: 'stand_up_comedian'},
+    { label: 'Donald Trump', value: 'donald_trump'},
+    { label: 'Joe Biden', value: 'joe_biden'},
+    { label: 'Kevin Hart', value: 'kevin_hart'},
   ];
 
   const DropdownPersonality = () => {
