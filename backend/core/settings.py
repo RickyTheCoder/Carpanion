@@ -13,13 +13,14 @@ import os
 
 # load environment variables from the .env file
 # safely use the environment variable
-OPENAI_API_KEY = env('OPENAI_API_KEY')
-
 
 
 from pathlib import Path
 from datetime import timedelta
 from .env import ( env, BASE_DIR )
+
+OPENAI_API_KEY = env('OPENAI_API_KEY')
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
