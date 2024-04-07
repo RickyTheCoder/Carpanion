@@ -16,12 +16,14 @@
     "axios": "^1.6.8",
     "expo": "~50.0.14",
     "expo-av": "^13.10.5",
+    "expo-camera": "~14.1.1",
     "expo-status-bar": "~1.11.1",
     "react": "18.2.0",
     "react-native": "0.73.6",
     "react-native-element-dropdown": "^2.10.4",
     "react-native-picker-select": "^9.1.3",
     "react-native-screens": "~3.29.0",
+    "react-native-vision-camera": "^3.9.2",
     "react-native-web": "~0.19.6"
   },
   "devDependencies": {
