@@ -179,7 +179,24 @@ class ConversationView(APIView):
 
         output = transcribe_audio_v2(audio_path='audio.wav')
 
-        print(output)
+        # use the output as a prompt for the GPT model
+
+        try:
+            response = text2text(output)
+
+            # get the audio file of the generated text
+
+            audio_file = text2speech(response)
+
+            # write the audio file to a temporary file
+            open('output.mp3', 'wb').write(audio_file)
+
+            audio_base64 = base64.b64encode(audio_file).decode('utf-8')
+
+            return Response({'output': response, 'audio': audio_base64 })
+        except Exception as e:
+            raise APIException(f"Error: {e}", code=400)
+
     
         # randomly select a label and generate either a fun fact or a joke
 
