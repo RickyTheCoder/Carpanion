@@ -77,6 +77,7 @@ const Video = () => {
 import { AuthProvider } from './components/AuthProvider';
 
 import { useAuth } from './components/AuthProvider';
+import RegisterScreen from './screens/register';
 
 function HomeScreen() {
   return (
@@ -105,7 +106,10 @@ function Tabs () {
               <Tab.Screen name="Settings" component={Settings} />
             </>
           ) : (
+            <>
+            <Tab.Screen name="Register" component={RegisterScreen} />
             <Tab.Screen name="Login" component={LoginScreen} />
+            </>
           )
         
         }
