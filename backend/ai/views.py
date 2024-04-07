@@ -1,6 +1,12 @@
 from django.shortcuts import render
-
+from core.env import env
 # Create your views here.
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.exceptions import APIException
+from rest_framework.permissions import IsAuthenticated
+
 
 import openai
 import speech_recognition as sr
@@ -27,7 +33,7 @@ import openai
 
 # Use Open API key to use library to send converted text to GPT of processing 
 
-openai.api_key = 'your_openai_api_key'
+openai.api_key = env('OPENAI_API_KEY')
 
 def process_with_gpt(text):
     response = openai.Completion.create(
@@ -55,31 +61,27 @@ def speech_request(request):
 
     return JsonResponse({'error': 'Request must be POST.'}, status=400)
 
-
-# backend/ai/views.py
+# ai/views.py
 
 from django.http import JsonResponse
+from .services import load_whisper_model, transcribe_audio
 from django.views.decorators.csrf import csrf_exempt
-from .transcription import transcribe
-import os
+from django.core.files.storage import default_storage
 
-@csrf_exempt  # For demonstration purposes, CSRF token is exempted
-def transcribe_audio(request):
+model = load_whisper_model()
+
+@csrf_exempt
+def transcribe_audio_request(request):
     if request.method == 'POST' and request.FILES['audio']:
-        # Handle the uploaded file
         audio_file = request.FILES['audio']
-        audio_file_path = os.path.join('path_to_save_audio_files', audio_file.name)
-        
-        with open(audio_file_path, 'wb+') as destination:
-            for chunk in audio_file.chunks():
-                destination.write(chunk)
+        file_name = default_storage.save(audio_file.name, audio_file)
+        file_path = default_storage.path(file_name)
 
-        # Transcribe the audio file using Whisper
-        text = transcribe(audio_file_path)
+        transcription = transcribe_audio(model, file_path)
 
         # Clean up the audio file if no longer needed
-        os.remove(audio_file_path)
-        
-        return JsonResponse({'transcription': text})
+        default_storage.delete(file_name)
+
+        return JsonResponse({'transcription': transcription})
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
