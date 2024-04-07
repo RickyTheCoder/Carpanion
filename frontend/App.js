@@ -58,6 +58,7 @@ const Video = () => {
   const [userIsTalking, setUserIsTalking] = useState(false);
   const [recording, setRecording] = useState(null);
   const [location, setLocation] = useState(null);
+  const [canCancelRecording, setCanCancelRecording] = useState(false);
   
   const requestPermission = async () => {
     const cameraGranted = await requestPermissionCamera();
@@ -91,16 +92,14 @@ const Video = () => {
         console.log('Starting recording..');
         const { recording } = await Audio.Recording.createAsync( Audio.RecordingOptionsPresets.HIGH_QUALITY
         );
+          
+        setUserIsTalking(true);
 
         setRecording(recording);
 
         // after 5 seconds stop recording
         await recording.prepareToRecordAsync();
         await recording.startAsync();
-
-        setTimeout(() => {
-          stopRecording();
-        }, 5000);
 
         console.log('Recording started');
       } catch (err) {
@@ -113,6 +112,10 @@ const Video = () => {
       if (!recording) {
         return;
       }
+
+      setCanCancelRecording(false);
+      setCanGetAIInfo(false);
+      setUserIsTalking(false);
 
       await recording.stopAndUnloadAsync();
       await Audio.setAudioModeAsync(
@@ -137,8 +140,40 @@ const Video = () => {
         }),
       });
 
-      console.log(res)
-      console.log('Recording stopped and stored at', uri);
+      const data = await res.json();
+
+        const path = FileSystem.documentDirectory + 'audio.mp3';
+
+        const audioBase64 = data.audio;
+
+      // write the base64 audio data to a file
+      await FileSystem.writeAsStringAsync(path, audioBase64, { encoding: FileSystem.EncodingType.Base64 });
+
+            // create a new sound object
+      const soundObject = new Audio.Sound();
+
+      try {
+        // load the sound from the file
+        await soundObject.loadAsync({ uri: path });
+
+        // play the sound
+
+        soundObject.setOnPlaybackStatusUpdate((status) => {
+          if (status.didJustFinish) {
+            soundObject.unloadAsync();
+            setCanGetAIInfo(true);
+          }
+        });
+        
+        await soundObject.playAsync();
+      } catch (error) {
+        console.log('Error playing sound', error);
+      }
+      finally {
+        setCanGetAIInfo(false);
+        setCanCancelRecording(true);
+        setUserIsTalking(true);
+      }
 
     } catch (error) {
       console.log('Error stopping recording', error);
@@ -152,7 +187,7 @@ const Video = () => {
     }
 
     const takePhoto = async () => {
-      if (!canGetAIInfo) {
+      if (!canGetAIInfo || userIsTalking) {
         return;
       }
 
@@ -208,6 +243,7 @@ const Video = () => {
           if (status.didJustFinish) {
             soundObject.unloadAsync();
             setCanGetAIInfo(true);
+            setUserIsTalking(true);
           }
         });
         
@@ -219,7 +255,7 @@ const Video = () => {
       }
     }
 
-    const interval = setInterval(takePhoto, 3000);
+    const interval = setInterval(takePhoto, 10000);
 
     requestPermission();
     startRecording();
@@ -268,7 +304,13 @@ const Video = () => {
       
       >
 
-      <View>
+      <View
+      style={{
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+      }}
+      >
     
       <TouchableOpacity onPress={toggleCameraType}>
           
@@ -280,6 +322,13 @@ const Video = () => {
           
           }}/>
       </TouchableOpacity>
+
+      <ButtonComponent title={'Stop Recording'} onPress={() => {
+          setCanCancelRecording(false);
+          stopRecording();
+      }
+      }
+      />
       </View> 
       </Camera>
       
@@ -299,6 +348,7 @@ import { AuthProvider } from './components/AuthProvider';
 import { useAuth } from './components/AuthProvider';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import RegisterScreen from './screens/register';
+import ButtonComponent from './components/button';
 
 function HomeScreen() {
   return (
