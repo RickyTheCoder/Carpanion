@@ -31,7 +31,7 @@ ai_settings = {}
 def set_assistant(setting_pair: str):
     setting = {setting_pair.split("=")[0]: setting_pair.split("=")[1]}
     ai_settings.update(setting)
-    setting_string = "From now on, you will be a buddy that sits at the shotgun in my car, talking to me like a best friend! Your personaly is\n"
+    setting_string = "From now on, you will be a buddy that sits at the shotgun in my car, talking to me like a best friend! You will evolve into an advanced digital road companion, personalizing the interaction with a specific voice and personality in a voice reflecting your personality too. Your personaly is\n"
     for key, value in ai_settings.items():
         setting_string += f"{key}: {value}\n"
     setting_string += "\n"
