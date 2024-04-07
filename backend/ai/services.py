@@ -54,8 +54,8 @@ def text2text(text):
     response = chat_completion.choices[0].message.content
     messages.append({"role": "assistant", "content": response})
     if len(messages) > 30:
-        messages.pop(0)
         messages.pop(1)
+        messages.pop(2)
     return response
 
 def text2speech(text):
