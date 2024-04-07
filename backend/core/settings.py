@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # safely use the environment variable
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+OPENAI_API_KEY = env('OPENAI_API_KEY')
 
 
 
