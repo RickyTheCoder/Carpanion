@@ -18,7 +18,9 @@
     "react-native": "0.73.6",
     "react-native-element-dropdown": "^2.10.4",
     "react-native-picker-select": "^9.1.3",
-    "react-native-screens": "~3.29.0"
+    "react-native-screens": "~3.29.0",
+    "react-native-vision-camera": "^3.9.2",
+    "expo-camera": "~14.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
